@@ -33,7 +33,7 @@ jobs:
           components: clippy
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 26
       - name: Install nuclear and dragonfly
         run: |
           cd nuclear && tools/release/build-runtimes.sh && ./install.sh --no-vscode --no-zed --no-agent
