@@ -36,7 +36,7 @@ jobs:
           node-version: 22
       - name: Install nuclear and dragonfly
         run: |
-          cd nuclear && ./install.sh --no-vscode --no-zed --no-agent
+          cd nuclear && tools/release/build-runtimes.sh && ./install.sh --no-vscode --no-zed --no-agent
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: "Content, build, tests, bundle"
         working-directory: website
