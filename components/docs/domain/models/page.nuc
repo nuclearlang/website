@@ -1,0 +1,14 @@
+// One page of the documentation, as the content build writes it (public/content/<key>.json): its html is
+// rendered from the markdown of a repository, with the code already highlighted.
+Page
+  path: string
+  title: string
+  html: string
+  headings: Heading[]
+  source: string
+
+// A heading of a page (levels 2 and 3), for the "On this page" list.
+Heading
+  level: int
+  id: string
+  text: string

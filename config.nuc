@@ -1,0 +1,3 @@
+// The platform this project is written for and the dialect it is built with (ADR-0093, ADR-0097).
+dragonfly(platform = "web", dialect = "react")
+app(name = "nuclearlang_website", title = "NuclearLang", description = "A minimal language for AI agents and people, transpiled to TypeScript, Dart and Python; Dragonfly, its framework for mobile, backend and web.", version = "0.1.0")

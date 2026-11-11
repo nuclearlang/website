@@ -1,0 +1,6 @@
+// The documentation: its pages, the menu, the home page and the search. The screens use only these.
+appcomponent DocsComponent
+  page() = GetPageUseCase.exec
+  site() = GetSiteUseCase.exec
+  home() = GetHomeUseCase.exec
+  search() = SearchUseCase.exec

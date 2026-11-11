@@ -1,0 +1,153 @@
+# The site's data: what tools/content.mjs turns into public/content/site.json and home.json, and the app shows. The
+# pages themselves are the .md of the nuclearlang repositories; nothing of the site is written in its code.
+
+[site]
+title = "NuclearLang"
+lead = "Only the program's logic."
+tagline = "A minimal language, made so agents and people write it fast, transpiled to TypeScript, Dart and Python through declarative dialects. Dragonfly is its framework for mobile, backend and web."
+# where the site is published, the organization of its repositories and their branch
+url = "https://nuclearlang.github.io"
+org = "https://github.com/nuclearlang"
+branch = "main"
+footer = "NuclearLang and Dragonfly · Apache-2.0 · this site is written in Nuclear (Dragonfly web, react)"
+
+[source]
+# the nuclearlang working tree (its repositories inside it), relative to this project; NUCLEAR_TREE overrides it
+tree = "../../../nuclearlang"
+# internal working documents stay in the repositories
+internal = ["docs/aprende/", "docs/context/"]
+
+# the links of the top bar
+[[top]]
+title = "Guide"
+path = "/docs/language/README"
+
+[[top]]
+title = "Reference"
+path = "/docs/language/reference"
+
+[[top]]
+title = "Dragonfly"
+path = "/docs/dragonfly/README"
+
+[[top]]
+title = "Dialects"
+path = "/spec/dialects"
+
+# the side menu: pages by their path in the repositories, without .md; `*` matches any part of a name, in order
+[[sidebar]]
+title = "Start"
+pages = ["docs/dragonfly/README", "docs/dragonfly/tutorial"]
+
+[[sidebar]]
+title = "Language guide"
+pages = ["docs/language/README", "docs/language/[0-9][0-9]-*"]
+
+[[sidebar]]
+title = "Reference"
+pages = ["docs/language/reference", "spec/nuclear-base", "spec/library", "spec/grammar", "spec/reserved-words", "spec/diagnostics", "spec/decisions"]
+
+[[sidebar]]
+title = "Dragonfly"
+pages = ["docs/dragonfly/README", "docs/dragonfly/*", "spec/dragonfly"]
+
+[[sidebar]]
+title = "Platforms and dialects"
+pages = ["spec/mobile", "spec/flutter", "spec/backend", "spec/fastapi", "spec/nestjs", "spec/web", "spec/react", "spec/typescript", "spec/nodejs", "spec/dart", "spec/python", "spec/dialects", "spec/definitions", "spec/projects", "docs/dialects/*"]
+
+[[sidebar]]
+title = "Internals"
+pages = ["docs/architecture"]
+
+# the home page
+[[home.actions]]
+title = "Language guide"
+path = "/docs/language/README"
+primary = true
+
+[[home.actions]]
+title = "Dragonfly"
+path = "/docs/dragonfly/README"
+
+[[home.actions]]
+title = "Reference"
+path = "/docs/language/reference"
+
+[[home.features]]
+title = "Less text, fewer tokens"
+text = "No ;, no braces, no return, no new, no async. What is not logic is written by the transpiler."
+
+[[home.features]]
+title = "One way to do each thing"
+text = "An agent never hesitates between two syntaxes. Errors come out as JSON with a code, a position and the fix."
+
+[[home.features]]
+title = "Declarative dialects"
+text = "TypeScript, Dart, Python, Flutter, FastAPI, NestJS and React. A dialect is TOML and templates; the parser never changes."
+
+[[home.features]]
+title = "Expert code"
+text = "The output runs as fast as an expert's and passes tsc --strict, flutter analyze and pyright --strict."
+
+[[home.features]]
+title = "Three platforms"
+text = "Mobile, backend and web with the same architecture, kinds and errors as values: the Nuclear of a project never changes with its dialect."
+
+[[home.features]]
+title = "AI built in"
+text = "Agents, tools and graphs with LangChain and LangGraph in the backends; Genkit chats, flows and RAG in mobile apps."
+
+[home.sample]
+title = "Nuclear in a few lines"
+note = "An enum, a module with its constructor in the header and a function whose last line is its value. The outputs are made by the real compiler when the site is built."
+# the language dialects the sample is built with
+targets = ["typescript", "dart", "python"]
+code = '''
+Role
+  user
+  admin("administrator")
+
+User(name: string, role: Role = Role.user)
+  visits: int = 0
+
+  isAdmin() boolean
+    role == Role.admin
+
+greet(user: User) string
+  title = if user.isAdmin()
+    'Admin'
+  else
+    'User'
+  '${title} ${user.name}'
+'''
+
+[home.platforms]
+title = "Dragonfly: one framework, three platforms"
+
+[[home.platforms.cards]]
+title = "Mobile"
+dialects = "flutter"
+text = "Apps for Android, iOS, desktop and web, with a local database, events, sessions and Genkit AI."
+path = "/docs/dragonfly/tutorial"
+
+[[home.platforms.cards]]
+title = "Backend"
+dialects = "fastapi · nestjs"
+text = "APIs with entities, relations, pagination, transactions, events and AI agents."
+path = "/docs/dragonfly/python"
+
+[[home.platforms.cards]]
+title = "Web"
+dialects = "react"
+text = "The mobile platform in a browser: screens, state managers and repositories. This site is one."
+path = "/docs/dragonfly/react"
+
+[home.install]
+title = "Install"
+# {{site}}: the site's url
+lines = [
+  "curl -fsSL {{site}}/install.sh | sh                 # Linux and macOS",
+  "irm {{site}}/install.ps1 | iex                      # Windows (PowerShell)",
+  "nuclear help                                        # documentation topics, also offline",
+  "nuclear spec --dialect flutter                      # the whole spec, for an agent",
+]

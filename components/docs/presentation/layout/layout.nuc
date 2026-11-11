@@ -1,0 +1,62 @@
+// The frame of every page: the top bar, the side menu, the page and the footer, all from the site's data.
+stateless Layout(current: string, content: Element)
+  build() Element
+    div(
+      className = "site",
+      children = [
+        TopBar(),
+        div(className = "frame", children = [Sidebar(current = current), main(className = "content", children = content)]),
+        Footer(),
+      ],
+    )
+
+stateless TopBar
+  build() Element
+    header(
+      className = "topbar",
+      children = SiteStateBuilder(
+        full = (site) => fragment(
+          a(className = "brand", href = "/", children = [span(className = "logo", children = "☢"), span(children = site.title)]),
+          nav(className = "links", children = site.top.map((l) => a(key = l.path, href = l.path, children = l.title))),
+          SearchBox(),
+          a(className = "github", href = site.org, children = "GitHub"),
+        ),
+        orElse = () => SearchBox(),
+      ),
+    )
+
+// The menu of the documentation; the page shown is marked.
+stateless Sidebar(current: string)
+  build() Element
+    aside(
+      className = "sidebar",
+      children = SiteStateBuilder(
+        loading = () => p(className = "muted", children = "Loading…"),
+        full = (site) => div(children = site.sections.map((s) => NavGroup(key = s.title, group = s, current = current))),
+        error = (e) => p(className = "error", children = e.message),
+      ),
+    )
+
+stateless NavGroup(group: NavSection, current: string)
+  build() Element
+    section(
+      className = "group",
+      children = [
+        h4(children = group.title),
+        ul(
+          children = group.items.map((item) =>
+            li(key = item.path, children = a(className = item.path == current ? "active" : "", href = item.path, children = item.title))
+          ),
+        ),
+      ],
+    )
+
+stateless Footer
+  build() Element
+    footer(
+      className = "footer",
+      children = SiteStateBuilder(
+        full = (site) => fragment(span(children = "${site.footer} · "), a(href = site.org, children = site.org.replaceAll("https://", ""))),
+        orElse = () => span(),
+      ),
+    )

@@ -1,0 +1,5 @@
+usecase GetSiteUseCase
+  (content: ContentRepository)
+
+  exec() Result<ContentError, Site>
+    ~content.site()

@@ -1,0 +1,14 @@
+// The site's content, built from the repositories' docs by tools/content.mjs into public/content/.
+@repository(path = "content")
+repository ContentRepository
+  @get(path = ":key.json", cache = true)
+  page(key: string) Result<ContentError, Page>
+
+  @get(path = "site.json", cache = true)
+  site() Result<ContentError, Site>
+
+  @get(path = "search.json", cache = true)
+  index() Result<ContentError, SearchEntry[]>
+
+  @get(path = "home.json", cache = true)
+  home() Result<ContentError, Home>

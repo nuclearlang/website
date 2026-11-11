@@ -1,0 +1,35 @@
+// The home page, from site.toml (public/content/home.json): its texts, its sections and the sample with its output
+// in each target, made by the real compiler.
+Home
+  title: string
+  lead: string
+  tagline: string
+  actions: Action[]
+  features: Feature[]
+  sampleTitle: string
+  sampleNote: string
+  sample: string
+  outputs: Output[]
+  platformsTitle: string
+  platforms: PlatformCard[]
+  installTitle: string
+  install: string
+
+Action
+  title: string
+  path: string
+  primary: boolean
+
+Feature
+  title: string
+  text: string
+
+Output
+  dialect: string
+  html: string
+
+PlatformCard
+  title: string
+  dialects: string
+  text: string
+  path: string

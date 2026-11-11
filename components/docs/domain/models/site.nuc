@@ -1,0 +1,17 @@
+// The site, from site.toml (public/content/site.json): its title, the links of the top bar, the side menu, the
+// footer and the organization of its repositories.
+Site
+  title: string
+  url: string
+  org: string
+  footer: string
+  top: Link[]
+  sections: NavSection[]
+
+Link
+  title: string
+  path: string
+
+NavSection
+  title: string
+  items: Link[]

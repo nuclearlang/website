@@ -1,0 +1,14 @@
+{
+  "name": "nuclearlang-website-content",
+  "private": true,
+  "type": "module",
+  "description": "Builds the website's content (public/content, public/static, llms.txt) from the docs of the nuclearlang repositories",
+  "scripts": {
+    "content": "node content.mjs"
+  },
+  "dependencies": {
+    "markdown-it": "14.1.0",
+    "shiki": "3.13.0",
+    "smol-toml": "1.3.4"
+  }
+}

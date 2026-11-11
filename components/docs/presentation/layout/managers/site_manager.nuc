@@ -1,0 +1,13 @@
+// The site's frame, read once.
+@stateModel(SiteState)
+statemanager SiteManager
+  (docs: DocsComponent)
+    load()
+
+  @state(SiteState.loading)
+  loading()
+
+  @before(loading)
+  @state(SiteState.full)
+  load() Result<ContentError, Site>
+    ~docs.site()

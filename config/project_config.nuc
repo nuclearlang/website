@@ -1,0 +1,5 @@
+// The site reads its own content: tools/content.mjs builds public/content/ from the repositories' docs.
+appConfig ProjectConfig
+  connections: Connection[] = [
+    Http(baseUrl = "/", timeout = 10000),
+  ]

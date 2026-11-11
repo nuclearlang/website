@@ -1,0 +1,12 @@
+// A page in the search index: its title, its headings and the words of its text.
+SearchEntry
+  path: string
+  title: string
+  headings: string[]
+  words: string
+
+// A page found by a search; a higher score is a better match.
+SearchResult
+  path: string
+  title: string
+  score: int

@@ -1,0 +1,53 @@
+// A page of the documentation at its address: /spec/nuclear-base or /docs/language/01-syntax (the same addresses
+// as the repositories' paths).
+@screen(route = "/:area/:name", providers = [PageManager, SiteManager, SearchManager])
+stateful DocScreen(area: string, name: string)
+  initState() void
+    PageManager.load("/${area}/${name}")
+
+  build() Element
+    DocBody(current = "/${area}/${name}")
+
+@screen(route = "/:area/:group/:name", providers = [PageManager, SiteManager, SearchManager])
+stateful DocGroupScreen(area: string, group: string, name: string)
+  initState() void
+    PageManager.load("/${area}/${group}/${name}")
+
+  build() Element
+    DocBody(current = "/${area}/${group}/${name}")
+
+stateless DocBody(current: string)
+  build() Element
+    Layout(
+      current = current,
+      content = PageStateBuilder(
+        loading = () => p(className = "muted", children = "Loading…"),
+        full = (page) => DocPage(page = page),
+        error = (e) => Missing(),
+      ),
+    )
+
+// The page: its text, and beside it the list of its headings and a link to its source.
+stateless DocPage(page: Page)
+  build() Element
+    div(
+      className = "doc",
+      children = [
+        article(className = "markdown", dangerouslySetInnerHTML = { "__html": page.html }),
+        aside(
+          className = "outline",
+          children = [
+            if page.headings.length > 0 h4(children = "On this page"),
+            ul(children = page.headings.map((h) => li(key = h.id, className = "level-${h.level}", children = a(href = "#${h.id}", children = h.text)))),
+            a(className = "edit", href = page.source, children = "Edit this page on GitHub"),
+          ],
+        ),
+      ],
+    )
+
+stateless Missing
+  build() Element
+    section(
+      className = "missing",
+      children = [h1(children = "Not found"), p(children = "There is no page at this address."), a(href = "/", children = "Go to the home page")],
+    )

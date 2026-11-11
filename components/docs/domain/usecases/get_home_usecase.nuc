@@ -1,0 +1,5 @@
+usecase GetHomeUseCase
+  (content: ContentRepository)
+
+  exec() Result<ContentError, Home>
+    ~content.home()

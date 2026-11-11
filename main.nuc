@@ -1,0 +1,4 @@
+// The app: the router with every @screen. index.ts (generated) starts Dragonfly and mounts App in #root.
+stateless App
+  build() Element
+    createElement(RouterProvider, router = appRouter())

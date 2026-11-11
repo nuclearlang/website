@@ -1,0 +1,50 @@
+# The website: the content from the repositories' docs, the app built and tested, the published bundle.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: nuclearlang/nuclear
+          path: nuclear
+      - uses: actions/checkout@v4
+        with:
+          path: website
+      - name: The other repositories of the working tree
+        run: |
+          git clone --depth 1 https://github.com/nuclearlang/dragonfly nuclear/dragonfly
+          git clone --depth 1 https://github.com/nuclearlang/dragonfly-mobile nuclear/dragonfly-mobile
+          git clone --depth 1 https://github.com/nuclearlang/dragonfly-backend nuclear/dragonfly-backend
+          git clone --depth 1 https://github.com/nuclearlang/dragonfly-web nuclear/dragonfly-web
+          git clone --depth 1 https://github.com/nuclearlang/nuclear-vscode nuclear/nuclear-vscode
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install nuclear and dragonfly
+        run: |
+          cd nuclear && ./install.sh --no-vscode --no-zed --no-agent
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: "Content, build, tests, bundle"
+        working-directory: website
+        run: |
+          export NUCLEAR_TREE="$GITHUB_WORKSPACE/nuclear"
+          (cd tools && npm ci --no-audit --no-fund)
+          node tools/content.mjs
+          dragonfly build
+          dragonfly install
+          dragonfly test
+          (cd build/app && npx vite build)

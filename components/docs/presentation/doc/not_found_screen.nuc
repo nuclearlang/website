@@ -1,0 +1,5 @@
+// Any other address.
+@screen(notFound = true, providers = [SiteManager, SearchManager])
+stateless NotFoundScreen
+  build() Element
+    div(className = "site", children = [TopBar(), Missing(), Footer()])

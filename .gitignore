@@ -1,0 +1,10 @@
+build/
+tools/node_modules/
+.nuclear/
+# made by tools/content.mjs from the repositories' docs
+public/content/
+public/static/
+public/llms.txt
+public/llms-full.txt
+public/sitemap.xml
+public/robots.txt

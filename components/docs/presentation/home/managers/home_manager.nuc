@@ -1,0 +1,13 @@
+// The home page's sample and its outputs, read when the home page opens.
+@stateModel(HomeState)
+statemanager HomeManager
+  (docs: DocsComponent)
+    load()
+
+  @state(HomeState.loading)
+  loading()
+
+  @before(loading)
+  @state(HomeState.full)
+  load() Result<ContentError, Home>
+    ~docs.home()

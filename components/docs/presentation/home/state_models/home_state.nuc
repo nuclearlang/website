@@ -1,0 +1,3 @@
+// The states of the home page's sample.
+HomeState
+  (full: Home, error: ContentError, loading: boolean)

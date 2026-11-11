@@ -1,0 +1,6 @@
+// The page of an address of the site: /docs/language/01-syntax is content/docs--language--01-syntax.json.
+usecase GetPageUseCase
+  (content: ContentRepository)
+
+  exec(path: string) Result<ContentError, Page>
+    ~content.page(path.split("/").filter((part) => part.length > 0).join("--"))

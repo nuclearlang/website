@@ -1,0 +1,14 @@
+// Search in the documentation: the results open below the box while it has text.
+stateless SearchBox
+  build() Element
+    div(
+      className = "search",
+      children = [
+        input(type = "search", placeholder = "Search the docs", onChange = (e) => SearchManager.find(e.target.value)),
+        SearchStateBuilder(
+          results = (found) => found.length == 0 ? span() : ul(className = "results", children = found.map((r) => li(key = r.path, children = a(href = r.path, children = r.title)))),
+          error = (e) => span(className = "error", children = e.message),
+          orElse = () => span(),
+        ),
+      ],
+    )

@@ -1,0 +1,3 @@
+// The states of a documentation page.
+PageState
+  (full: Page, error: ContentError, loading: boolean)

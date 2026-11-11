@@ -1,0 +1,10 @@
+// How well a page matches a query: its title first, then its headings, then any word of its text.
+service SearchScore
+  of(entry: SearchEntry, query: string) int
+    if query in entry.title.lower()
+      return 3
+    if entry.headings.any((h) => query in h.lower())
+      return 2
+    if query in entry.words
+      return 1
+    0

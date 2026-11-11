@@ -1,0 +1,8 @@
+// The search box: every change of the text looks for the pages again.
+@stateModel(SearchState)
+statemanager SearchManager
+  (docs: DocsComponent)
+
+  @state(SearchState.results)
+  find(query: string) Result<ContentError, SearchResult[]>
+    ~docs.search(query)

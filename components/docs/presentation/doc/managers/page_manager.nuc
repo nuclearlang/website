@@ -1,0 +1,12 @@
+// Loads the page of the screen's address.
+@stateModel(PageState)
+statemanager PageManager
+  (docs: DocsComponent)
+
+  @state(PageState.loading)
+  loading()
+
+  @before(loading)
+  @state(PageState.full)
+  load(path: string) Result<ContentError, Page>
+    ~docs.page(path)

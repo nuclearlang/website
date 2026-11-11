@@ -1,0 +1,11 @@
+// The ten pages that best match a query (two letters at least), the best first.
+usecase SearchUseCase
+  (content: ContentRepository, score: SearchScore)
+
+  exec(query: string) Result<ContentError, SearchResult[]>
+    text = query.trim().lower()
+    if text.length < 2
+      return Ok([])
+    entries = ~content.index()
+    found = entries.map((e) => SearchResult(path = e.path, title = e.title, score = score.of(e, text)))
+    Ok(found.filter((r) => r.score > 0).sortedBy((r) => -r.score).take(10))

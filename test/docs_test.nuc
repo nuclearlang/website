@@ -1,0 +1,80 @@
+// Tests of the site: the content repository is a mock; the use cases, managers and screens are the real code.
+page() Page
+  Page(
+    path = "/spec/nuclear-base",
+    title = "The base language",
+    html = "<h1>The base language</h1><p>Every rule of Nuclear.</p>",
+    headings = [Heading(level = 2, id = "names", text = "Names and files")],
+    source = "https://github.com/nuclearlang/nuclear/blob/main/spec/nuclear-base.md",
+  )
+
+entry(path: string, title: string, headings: string[], words: string) SearchEntry
+  SearchEntry(path = path, title = title, headings = headings, words = words)
+
+@mock([ContentRepository])
+DocsTest
+  beforeEach()
+    when(ContentRepository.page).thenReturn(Ok(page()))
+    when(ContentRepository.site).thenReturn(
+      Ok(
+        Site(
+          title = "NuclearLang",
+          url = "https://example.org",
+          org = "https://github.com/example",
+          footer = "Footer text",
+          top = [Link(title = "Guide", path = "/docs/language/README")],
+          sections = [NavSection(title = "Reference", items = [Link(title = "Base", path = "/spec/nuclear-base")])],
+        ),
+      ),
+    )
+    when(ContentRepository.index).thenReturn(
+      Ok([
+        entry("/c", "Operators", [], "results of every operation"),
+        entry("/b", "Errors", ["Results and errors"], ""),
+        entry("/a", "Results", [], ""),
+        entry("/d", "Lambdas", [], "nothing here"),
+      ]),
+    )
+    when(ContentRepository.home).thenReturn(
+      Ok(
+        Home(
+          title = "NuclearLang",
+          lead = "Only the program's logic.",
+          tagline = "A language.",
+          actions = [Action(title = "Guide", path = "/docs/language/README", primary = true)],
+          features = [Feature(title = "Less text", text = "No braces.")],
+          sampleTitle = "Nuclear in a few lines",
+          sampleNote = "A note.",
+          sample = "<pre>sample</pre>",
+          outputs = [Output(dialect = "typescript", html = "<pre>ts</pre>")],
+          platformsTitle = "Three platforms",
+          platforms = [PlatformCard(title = "Web", dialects = "react", text = "In a browser.", path = "/docs/dragonfly/react")],
+          installTitle = "Install",
+          install = "curl -fsSL https://example.org/install.sh | sh",
+        ),
+      ),
+    )
+
+  @test("the search ranks a title before a heading before a word of the text")
+  ranks()
+    found = okOf(~SearchUseCase.exec("Results"))
+    expect(found.map((r) => r.path)).toEqual(["/a", "/b", "/c"])
+
+  @test("a query of one letter finds nothing")
+  shortQuery()
+    expect(okOf(~SearchUseCase.exec(" r "))).toEqual([])
+
+  @widget("a page of the documentation shows its text, its headings and the menu")
+  showsPage()
+    renderScreen(DocScreen(area = "spec", name = "nuclear-base"))
+    ~screen.findByText("Every rule of Nuclear.")
+    ~screen.findByText("Names and files")
+    ~screen.findByText("Base")
+    ~screen.findByText("Guide")
+
+  @widget("the home page shows the sample with a tab per target")
+  showsHome()
+    renderScreen(HomeScreen())
+    ~screen.findByText("Only the program's logic.")
+    ~screen.findByText("typescript")
+    ~screen.findByText("Three platforms")

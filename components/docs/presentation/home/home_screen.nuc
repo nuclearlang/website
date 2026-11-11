@@ -1,0 +1,78 @@
+// The home page: every text and section comes from the site's data (home.json); the sample's outputs are the real
+// compiler's.
+@screen(route = "/", providers = [HomeManager, SiteManager, SearchManager])
+stateless HomeScreen
+  build() Element
+    div(
+      className = "site home",
+      children = [
+        TopBar(),
+        HomeStateBuilder(
+          loading = () => p(className = "muted center", children = "Loading…"),
+          full = (home) => HomeBody(home = home),
+          error = (e) => p(className = "error center", children = e.message),
+        ),
+        Footer(),
+      ],
+    )
+
+stateless HomeBody(home: Home)
+  build() Element
+    fragment(
+      section(
+        className = "hero",
+        children = [
+          p(className = "logo big", children = "☢"),
+          h1(children = home.title),
+          p(className = "lead", children = home.lead),
+          p(className = "tagline", children = home.tagline),
+          div(
+            className = "actions",
+            children = home.actions.map((x) => a(key = x.path, className = x.primary ? "button primary" : "button", href = x.path, children = x.title)),
+          ),
+        ],
+      ),
+      section(className = "features", children = home.features.map((f) => article(key = f.title, children = [h3(children = f.title), p(children = f.text)]))),
+      Sample(home = home),
+      section(
+        className = "platforms",
+        children = [
+          h2(children = home.platformsTitle),
+          div(
+            className = "cards",
+            children = home.platforms.map((c) =>
+              a(key = c.title, className = "card", href = c.path, children = [h3(children = c.title), small(children = c.dialects), p(children = c.text)])
+            ),
+          ),
+        ],
+      ),
+      section(className = "install", children = [h2(children = home.installTitle), pre(children = home.install)]),
+    )
+
+// The sample and its output in each target, one tab each.
+stateful Sample(home: Home)
+  selected: int = 0
+
+  build() Element
+    section(
+      className = "sample",
+      children = [
+        h2(children = home.sampleTitle),
+        div(
+          className = "tabs",
+          children = tabs().map((t) =>
+            button(key = t, className = tabs().indexOf(t) == selected ? "tab active" : "tab", onClick = () => select(tabs().indexOf(t)), children = t)
+          ),
+        ),
+        div(className = "code", dangerouslySetInnerHTML = { "__html": selected == 0 ? home.sample : home.outputs[selected - 1].html }),
+        p(className = "muted", children = home.sampleNote),
+      ],
+    )
+
+  tabs() string[]
+    ["Nuclear", ...home.outputs.map((o) => o.dialect)]
+
+  select(index: int) void
+    setState(() =>
+      selected = index
+    )
