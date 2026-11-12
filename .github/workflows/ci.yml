@@ -48,3 +48,24 @@ jobs:
           dragonfly install
           dragonfly test
           (cd build/app && npx vite build)
+      - name: The SPA fallback (an unknown address loads the app)
+        run: cp build/app/dist/index.html build/app/dist/404.html
+        working-directory: website
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: website/build/app/dist
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

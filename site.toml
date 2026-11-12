@@ -53,7 +53,7 @@ pages = ["docs/dragonfly/README", "docs/dragonfly/*", "spec/dragonfly"]
 
 [[sidebar]]
 title = "AI"
-pages = ["docs/ai/loop"]
+pages = ["docs/ai/loop", "docs/ai/mcp"]
 
 [[sidebar]]
 title = "Platforms and dialects"
