@@ -36,7 +36,7 @@ while [ $# -gt 0 ]; do
     --no-vscode) VSCODE=0 ;;
     --no-agent) AGENT=0 ;;
     --uninstall)
-      rm -f "$BIN/nuclear" "$BIN/dragonfly" "$BIN/nuclear-lsp"
+      rm -f "$BIN/nuclear" "$BIN/dragonfly" "$BIN/nuclear-lsp" "$BIN/nuclear-loop"
       rm -rf "$INSTALL"
       for d in $SKILL_DIRS; do rm -rf "$d/nuclear"; done
       for rc in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile" "$HOME/.config/fish/conf.d/nuclearlang.fish"; do
@@ -116,6 +116,8 @@ rm -rf "$INSTALL"
 mkdir -p "$(dirname "$INSTALL")" "$BIN"
 mv "$tmp/nuclearlang" "$INSTALL"
 for b in nuclear dragonfly nuclear-lsp; do ln -sf "$INSTALL/bin/$b" "$BIN/$b"; done
+# nuclear-loop needs node (the Loop without an editor, ADR-0102)
+if [ -f "$INSTALL/bin/nuclear-loop" ]; then ln -sf "$INSTALL/bin/nuclear-loop" "$BIN/nuclear-loop"; fi
 "$BIN/nuclear" dialect list >/dev/null || fail "the installed nuclear does not run on this system"
 
 if [ "$AGENT" = 1 ]; then

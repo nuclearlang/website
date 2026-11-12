@@ -52,6 +52,10 @@ title = "Dragonfly"
 pages = ["docs/dragonfly/README", "docs/dragonfly/*", "spec/dragonfly"]
 
 [[sidebar]]
+title = "AI"
+pages = ["docs/ai/loop"]
+
+[[sidebar]]
 title = "Platforms and dialects"
 pages = ["spec/mobile", "spec/flutter", "spec/backend", "spec/fastapi", "spec/nestjs", "spec/web", "spec/react", "spec/typescript", "spec/nodejs", "spec/dart", "spec/python", "spec/dialects", "spec/definitions", "spec/projects", "docs/dialects/*"]
 
