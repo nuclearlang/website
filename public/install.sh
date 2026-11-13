@@ -8,11 +8,14 @@
 # It downloads the release of this system and architecture (Linux x86_64/aarch64, any distribution: the binaries are
 # static; macOS Intel/Apple silicon) from GitHub, checks its SHA-256, installs it in ~/.local/share/nuclearlang with
 # `nuclear`, `dragonfly` and `nuclear-lsp` linked in ~/.local/bin, puts that folder in the PATH of your shells, gives
-# the AI agents the `nuclear` skill and, when VS Code is there, installs its extension. No sudo.
+# the AI agents the `nuclear` skill and, when VS Code is there, installs its extension. No sudo. Then, in a terminal,
+# the set-up of the AI services (`nuclear-loop setup`: it reads this machine, suggests a profile and asks before
+# anything is downloaded; a machine already set up is brought up to date without questions).
 #
 # Options (or environment): --version <v> (NUCLEAR_VERSION, default: the latest), --no-modify-path
-# (NUCLEAR_NO_MODIFY_PATH=1), --no-vscode, --no-agent, --uninstall. NUCLEAR_INSTALL and NUCLEAR_BIN change the folders;
-# NUCLEAR_REPO the repository (owner/name) and NUCLEAR_DOWNLOAD the base url of the files (a mirror).
+# (NUCLEAR_NO_MODIFY_PATH=1), --no-vscode, --no-agent, --no-ai, --profile remote|lite|medium|hard (NUCLEAR_AI_PROFILE:
+# that profile, no questions), --uninstall. NUCLEAR_INSTALL and NUCLEAR_BIN change the folders; NUCLEAR_REPO the
+# repository (owner/name) and NUCLEAR_DOWNLOAD the base url of the files (a mirror).
 set -eu
 
 REPO=${NUCLEAR_REPO:-nuclearlang/nuclear}
@@ -23,6 +26,8 @@ MODIFY_PATH=${NUCLEAR_NO_MODIFY_PATH:+0}
 MODIFY_PATH=${MODIFY_PATH:-1}
 VSCODE=1
 AGENT=1
+AI=1
+PROFILE=${NUCLEAR_AI_PROFILE:-}
 SKILL_DIRS="$HOME/.claude/skills $HOME/.agents/skills $HOME/.codex/skills"
 MARK="# added by the NuclearLang installer"
 
@@ -35,7 +40,12 @@ while [ $# -gt 0 ]; do
     --no-modify-path) MODIFY_PATH=0 ;;
     --no-vscode) VSCODE=0 ;;
     --no-agent) AGENT=0 ;;
+    --no-ai) AI=0 ;;
+    --profile) PROFILE=${2:?--profile needs a value}; shift ;;
     --uninstall)
+      # the AI services first (what starts them at login, the graph's tool): their set-up takes them away
+      [ -x "$BIN/nuclear-loop" ] && NUCLEAR_INSTALL="$INSTALL" NUCLEAR_BIN="$BIN" "$BIN/nuclear-loop" setup --remove >/dev/null 2>&1 || true
+      rm -f "$BIN/nuclear-developer"
       rm -f "$BIN/nuclear" "$BIN/dragonfly" "$BIN/nuclear-lsp" "$BIN/nuclear-loop"
       rm -rf "$INSTALL"
       for d in $SKILL_DIRS; do rm -rf "$d/nuclear"; done
@@ -45,7 +55,7 @@ while [ $# -gt 0 ]; do
       command -v code >/dev/null 2>&1 && code --uninstall-extension nuclearlang.nuclearlang >/dev/null 2>&1 || true
       say "NuclearLang uninstalled."
       exit 0 ;;
-    -h|--help) sed -n '2,17p' "$0" 2>/dev/null | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,20p' "$0" 2>/dev/null | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) fail "unknown option: $1" ;;
   esac
   shift
@@ -88,9 +98,9 @@ if [ "$VERSION" = latest ]; then
     tag=""
     if command -v curl >/dev/null 2>&1; then
       tag=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest" 2>/dev/null || true)
-      tag=${tag##*/}
+      case $tag in */releases/tag/*) tag=${tag##*/} ;; *) tag="" ;; esac
     fi
-    [ -n "$tag" ] && [ "$tag" != latest ] || tag=$(read_url "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)
+    [ -n "$tag" ] || tag=$(read_url "https://api.github.com/repos/$REPO/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)
     VERSION=$tag
   fi
   VERSION=${VERSION#v}
@@ -151,8 +161,33 @@ if [ "$on_path" = 0 ] && [ "$MODIFY_PATH" = 1 ]; then
   fi
 fi
 
+# --- the AI services (ADR-0106) ---
+# Their environments live inside the installation: a machine already set up gets them again for this version, with
+# the profile it had. A new one is asked, in the terminal; nothing is downloaded before the user chooses.
+MACHINE="${XDG_CONFIG_HOME:-$HOME/.config}/nuclearlang/ai.env"
+[ -n "$PROFILE" ] || PROFILE=$(sed -n 's/^NUCLEAR_AI_PROFILE=//p' "$MACHINE" 2>/dev/null || true)
+ai_note=""
+if [ "$AI" = 1 ]; then
+  if [ ! -x "$BIN/nuclear-loop" ] || ! command -v node >/dev/null 2>&1; then
+    ai_note="The AI services need Node.js for their set-up: install it and run \`nuclear-loop setup\`, or use the set-up of the VS Code extension."
+  elif [ -n "$PROFILE" ]; then
+    say ""
+    say "The AI services, profile $PROFILE..."
+    NUCLEAR_INSTALL="$INSTALL" NUCLEAR_BIN="$BIN" "$BIN/nuclear-loop" setup --profile "$PROFILE" --yes >&2 \
+      || ai_note="The AI services are not set up: run \`nuclear-loop setup\`."
+  elif [ -z "${CI:-}" ] && (: < /dev/tty) 2>/dev/null; then
+    say ""
+    say "The AI services: local agents that write the code, and the Smart Graph. You choose what is downloaded."
+    NUCLEAR_INSTALL="$INSTALL" NUCLEAR_BIN="$BIN" "$BIN/nuclear-loop" setup < /dev/tty >&2 \
+      || ai_note="The AI services are not set up: run \`nuclear-loop setup\` when you want them."
+  else
+    ai_note="The AI services are not set up (no terminal here): run \`nuclear-loop setup\`."
+  fi
+fi
+
 say ""
 say "NuclearLang $VERSION is installed: nuclear and dragonfly in $BIN."
+[ -z "$ai_note" ] || say "$ai_note"
 if [ "$on_path" = 0 ]; then
   if [ "$MODIFY_PATH" = 1 ]; then say "Open a new terminal (or run: export PATH=\"$BIN:\$PATH\")."
   else say "Add $BIN to your PATH: export PATH=\"$BIN:\$PATH\""; fi

@@ -7,3 +7,4 @@ All notable changes to the website are written here; versions follow [Semantic V
 - First public version.
 - Deploy to GitHub Pages (`nuclearlang.github.io`) from CI, with the SPA `404.html` fallback.
 - The AI menu has the MCP server's page (`docs/ai/mcp`); the Dragonfly menu gets the generators' guide by its pattern.
+- The AI menu starts with the set-up of the AI services (`docs/ai/setup`).
